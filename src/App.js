@@ -1,25 +1,39 @@
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+import logo from './image.png';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Login from './RegisterForm'; // Asegúrate de tener la ruta correcta al archivo Login.jsx
 
 function App() {
+  const [showLogin, setShowLogin] = useState(false);
+
+  const handleShowLogin = () => {
+    setShowLogin(true);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {showLogin ? (
+        <Login />
+      ) : (
+        <div>
+          <button className="btn btn-primary" onClick={handleShowLogin}>Login/Registro</button>
+          <header className="App-header">
+            <img src={logo} className="App-logo" alt="React logo" />
+            <h1>Bienvenidos a la aplicacion!</h1>
+            <p>
+              Conexión al siguiente nivel
+            </p>
+            <a>
+              Somos la empresa BIDA
+            </a>
+          </header>
+        </div>
+      )}
     </div>
   );
 }
 
+ReactDOM.render(<App />, document.getElementById('root'));
 export default App;
