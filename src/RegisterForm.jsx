@@ -1,79 +1,48 @@
 import React, { useState } from 'react';
+import './styles.css'; // Importamos el archivo de estilos CSS
 
-const RegisterForm = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
+const LoginForm = ({ onLogin }) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes realizar la lógica de envío del formulario, como enviar los datos a una API o realizar validaciones
-    console.log(formData);
+
+    // Validación de campos
+    if (username.trim() === '' || password.trim() === '') {
+      setErrorMessage('Por favor, complete todos los campos.');
+      return;
+    }
+
+    // Llamada a la función de inicio de sesión
+    onLogin({ username, password });
+    setUsername('');
+    setPassword('');
+    setErrorMessage('');
   };
 
   return (
-    <div>
-      <h2>Registro</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Nombre de usuario:</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="email">Correo electrónico:</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Contraseña:</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="confirmPassword">Confirmar contraseña:</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit">Registrarse</button>
-      </form>
-    </div>
+    <form className="form" onSubmit={handleSubmit}>
+      <h2>Bienvenido</h2> {/* Mensaje de bienvenida */}
+      <input
+        className="input"
+        type="text"
+        placeholder="Usuario"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <input
+        className="input"
+        type="password"
+        placeholder="Contraseña"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      {errorMessage && <p className="error">{errorMessage}</p>}
+      <button className="button" type="submit">Iniciar Sesión</button>
+    </form>
   );
 };
 
-export default RegisterForm;
+export default LoginForm;
