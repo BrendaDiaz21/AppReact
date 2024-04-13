@@ -1,64 +1,186 @@
 import React, { useState } from 'react';
+import './styles.css';
 
-const ProductCRUD = () => {
-  const [products, setProducts] = useState([]);
-  const [productName, setProductName] = useState('');
-  const [productPrice, setProductPrice] = useState('');
 
-  const handleProductNameChange = (e) => {
-    setProductName(e.target.value);
-  };
-//hola
-  const handleProductPriceChange = (e) => {
-    setProductPrice(e.target.value);
-  };
+const Product = ({ product, onDelete, onUpdate }) => {
+  const [editing, setEditing] = useState(false);
+  const [description, setDescription] = useState(product.description);
+  const [price, setPrice] = useState(product.price);
+  const [quantity, setQuantity] = useState(product.quantity);
 
-  const handleAddProduct = () => {
-    if (!productName || !productPrice) return;
 
-    const newProduct = {
-      id: Date.now(),
-      name: productName,
-      price: productPrice,
-    };
 
-    setProducts([...products, newProduct]);
-    setProductName('');
-    setProductPrice('');
-  };
-
-  const handleDeleteProduct = (id) => {
-    setProducts(products.filter((product) => product.id !== id));
+  const handleUpdate = () => {
+    onUpdate({ id: product.id, description, price, quantity });
+    setEditing(false);
   };
 
   return (
+    <>
+ 
+      <tr>
+        <td>{product.id}</td>
+        <td>
+          {editing ? (
+            <input
+              type="text"
+              className="input-field"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          ) : (
+            <span>{product.description}</span>
+          )}
+        </td>
+        <td>
+          {editing ? (
+            <input
+              type="number"
+              className="input-field"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          ) : (
+            <span>{product.price}</span>
+          )}
+        </td>
+        <td>
+          {editing ? (
+            <input
+              type="number"
+              className="input-field"
+              value={quantity}
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+          ) : (
+            <span>{product.quantity}</span>
+          )}
+        </td>
+        <td>{price * quantity}</td>
+        <td>
+          {editing ? (
+            <button className="update-btn" onClick={handleUpdate}>
+              Actualizar
+            </button>
+          ) : (
+            <div className="button-container">
+              <button className="delete-btn" onClick={() => onDelete(product.id)}>
+                Eliminar
+              </button>
+              <button className="edit-btn" onClick={() => setEditing(true)}>
+                Editar
+              </button>
+            </div>
+          )}
+        </td>
+      </tr>
+    </>
+  );
+};
+
+const AddProductForm = ({ onAdd }) => {
+  const [description, setDescription] = useState('');
+  const [price, setPrice] = useState('');
+  const [quantity, setQuantity] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onAdd({ description, price, quantity });
+    setDescription('');
+    setPrice('');
+    setQuantity('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="add-form">
+      <input
+        type="text"
+        placeholder="Descripción"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        required
+      />
+      <input
+        type="number"
+        placeholder="Precio"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        required
+      />
+      <input
+        type="number"
+        placeholder="Cantidad"
+        value={quantity}
+        onChange={(e) => setQuantity(e.target.value)}
+        required
+      />
+      <button type="submit" className="add-btn">
+        Agregar Producto
+      </button>
+    </form>
+  );
+};
+
+const ProductTable = ({ products, onDelete, onUpdate, onAdd }) => {
+  return (
     <div>
-      <h1>Product CRUD</h1>
-      <div>
-        <input
-          type="text"
-          placeholder="Product Name"
-          value={productName}
-          onChange={handleProductNameChange}
-        />
-        <input
-          type="number"
-          placeholder="Product Price"
-          value={productPrice}
-          onChange={handleProductPriceChange}
-        />
-        <button onClick={handleAddProduct}>Add Product</button>
-      </div>
-      <ul>
-        {products.map((product) => (
-          <li key={product.id}>
-            {product.name} - ${product.price}
-            <button onClick={() => handleDeleteProduct(product.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+      
+      <h2>Tabla de Productos</h2>
+      <table className="product-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Acciones</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {products.map((product) => (
+            <Product
+              key={product.id}
+              product={product}
+              onDelete={onDelete}
+              onUpdate={onUpdate}
+            />
+          ))}
+        </tbody>
+      </table>
+      <AddProductForm onAdd={onAdd} />
     </div>
   );
 };
 
-export default ProductCRUD;
+
+
+const App = () => {
+  const [products, setProducts] = useState([
+    { id: 1, description: 'Mesa', price: 10, quantity: 5 },
+    { id: 2, description: 'Silla', price: 20, quantity: 10 },
+  ]);
+
+  const handleDelete = (productId) => {
+    setProducts(products.filter((product) => product.id !== productId));
+  };
+
+  const handleUpdate = (updatedProduct) => {
+    setProducts(products.map((product) => (product.id === updatedProduct.id ? updatedProduct : product)));
+  };
+
+  const handleAdd = (newProduct) => {
+    const productId = products.length + 1;
+    setProducts([...products, { id: productId, ...newProduct }]);
+  };
+
+  return (
+    <div className="container">
+      <h1 className="title">CRUD de Productos</h1>
+      <ProductTable products={products} onDelete={handleDelete} onUpdate={handleUpdate} onAdd={handleAdd} />
+    </div>
+  );
+};
+
+
+export default App;
